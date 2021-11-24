@@ -108,7 +108,7 @@ def upisiSigurne2(matrica, redovi, kolone, indMatrica):
 def iscrtajMapu(resenje, n):
     for i in range(n):
         for j in range(n):
-            print(str(resenje[f'p{i}{j}']) + " ", end = "")
+            print(str(resenje[f'p_{i}_{j}']) + " ", end = "")
         print()
 
 if __name__ == '__main__':
@@ -121,16 +121,16 @@ if __name__ == '__main__':
     problem = Problem()
     for i in range(n):
         for j in range(n):
-            problem.addVariable(f"p{i}{j}", [0,1])
+            problem.addVariable(f"p_{i}_{j}", [0,1])
     problem.addVariable('a', [1])
     problem.addVariable('b', [0])
 
     promenljivePoRedovima = []    
     promenljivePoKolonama = [] 
     for i in range(n):
-        pomocna = [f'p{i}{j}' for j in range(n)]
+        pomocna = [f'p_{i}_{j}' for j in range(n)]
         promenljivePoRedovima.append(pomocna)
-        pomocna2 = [f'p{j}{i}' for j in range(n)]
+        pomocna2 = [f'p_{j}_{i}' for j in range(n)]
         promenljivePoKolonama.append(pomocna2)
 
     indMatrica = [[False for i in range(n)] for i in range(n)]
@@ -141,9 +141,9 @@ if __name__ == '__main__':
         for j in range(n):
             if indMatrica[i][j]:
                 if matrica[i][j] == 0:
-                    problem.addConstraint(lambda a, b: a == b, [f"p{i}{j}", 'b'])
+                    problem.addConstraint(lambda a, b: a == b, [f"p_{i}_{j}", 'b'])
                 if matrica[i][j] == 1:
-                    problem.addConstraint(lambda a, b: a == b, [f"p{i}{j}", 'a'])
+                    problem.addConstraint(lambda a, b: a == b, [f"p_{i}_{j}", 'a'])
 
 
     for i in range(n):
