@@ -15,6 +15,8 @@ def pomocnaF(vektor):
                 lista.append(suma)
             suma=0
             i+=1
+        if lista == []:
+            lista.append(0)
         return lista
 
 
@@ -23,8 +25,6 @@ def dodajConstaint(problem : Problem, uslov, promenljive):
         return pomocnaF(niz) == uslov
     problem.addConstraint(o1, promenljive)
     
-
-
 
 def ucitajPodatke(n):
     redovi = []
@@ -78,6 +78,10 @@ def upisiSigurne1(matrica, redovi, kolone, indMatrica):
 def iscrtajRed(matrica,red,i, indMatrica):
     novi = [1 for j in range(len(matrica[0]))]
     suma = 0
+    if red[0] == 0:
+        matrica[i] = [0 for _ in range(len(matrica[0]))]
+        indMatrica[i] = [True for j in range(len(matrica[0]))]
+        return
     for el in red[:-1]:
         suma += el
         novi[suma] = 0
@@ -88,6 +92,11 @@ def iscrtajRed(matrica,red,i, indMatrica):
 def iscrtajKolonu(matrica,kolona,i,indMatrica):
     n = len(matrica[0])
     suma = 0
+    if kolona[0] == 0:
+        for j in range(n):
+            matrica[j][i] = 0
+            indMatrica[j][i] = True
+        return
     for j in range(n):
         matrica[j][i] = 1
         indMatrica[j][i] = True
@@ -104,11 +113,23 @@ def upisiSigurne2(matrica, redovi, kolone, indMatrica):
     for i,kolona in enumerate(kolone):
         if sum(kolona) + len(kolona) == n+1 and len(kolona) != 1:
             iscrtajKolonu(matrica, kolona, i, indMatrica)
+    
+def upisiSigurne3(matrica,redovi,kolone,indMatrica):
+    for i,red in enumerate(redovi):
+        if sum(red) == 0:
+            iscrtajRed(matrica, red, i, indMatrica)
+    for i,kolona in enumerate(kolone):
+        if sum(kolona) == 0:
+            iscrtajKolonu(matrica, kolona, i, indMatrica)
+    
 
 def iscrtajMapu(resenje, n):
     for i in range(n):
         for j in range(n):
-            print(str(resenje[f'p_{i}_{j}']) + " ", end = "")
+            if resenje[f'p_{i}_{j}']:
+                print(u"\u2588", end = "")
+            else:
+                print(" ", end = "")
         print()
 
 if __name__ == '__main__':
@@ -128,15 +149,18 @@ if __name__ == '__main__':
     promenljivePoRedovima = []    
     promenljivePoKolonama = [] 
     for i in range(n):
-        pomocna = [f'p_{i}_{j}' for j in range(n)]
-        promenljivePoRedovima.append(pomocna)
-        pomocna2 = [f'p_{j}_{i}' for j in range(n)]
-        promenljivePoKolonama.append(pomocna2)
+        pomocnaRed = [f'p_{i}_{j}' for j in range(n)]
+        pomocnaKol = [f'p_{j}_{i}' for j in range(n)]
+        promenljivePoRedovima.append(pomocnaRed)
+        promenljivePoKolonama.append(pomocnaKol)
 
     indMatrica = [[False for i in range(n)] for i in range(n)]
+    
     upisiSigurne1(matrica,redovi,kolone, indMatrica)
     upisiSigurne2(matrica,redovi,kolone, indMatrica)
+    upisiSigurne3(matrica,redovi,kolone, indMatrica)
 
+    #dodavanje constrainta za sigurne pozicije
     for i in range(n):
         for j in range(n):
             if indMatrica[i][j]:
@@ -145,11 +169,12 @@ if __name__ == '__main__':
                 if matrica[i][j] == 1:
                     problem.addConstraint(lambda a, b: a == b, [f"p_{i}_{j}", 'a'])
 
-
+    #dodavanje constrainta za svaki red
     for i in range(n):
         uslov = redovi[i]
         dodajConstaint(problem, uslov, promenljivePoRedovima[i])
         
+    #dodavanje constrainta za svaku kolonu
     for i in range(n):
         uslov = kolone[i]
         dodajConstaint(problem, uslov, promenljivePoKolonama[i])
